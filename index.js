@@ -36,7 +36,13 @@ async function run() {
         res.send(result);
     });
     app.get('/products',async(req,res)=>{
-        const cursor=productsCollection.find();
+    const email=req.query.email;
+    const query={};
+    if(email)
+    {
+        query.exporterEmail=email;
+    }
+        const cursor=productsCollection.find(query);
         const result=await cursor.toArray();
         res.send(result);
     });
@@ -46,6 +52,15 @@ async function run() {
         const result=await productsCollection.findOne(query);
         res.send(result);
     })
+    app.post('/products',async(req,res)=>{
+        // console.log('products post api hitted');
+        const newProduct=req.body;
+        // console.log('new Product:',newProduct);
+        const result=await productsCollection.insertOne(newProduct);
+        res.send(result);
+
+    })
+    // import related APIs
     app.get('/imports',async(req,res)=>{
         const email=req.query.email;
         const query={};
