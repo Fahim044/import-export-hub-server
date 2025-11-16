@@ -57,6 +57,12 @@ async function run() {
         const result=await cursor.toArray();
         res.send(result);
     })
+    app.get('/imports/:id',async(req,res)=>{
+        const id=req.params.id;
+        const query={_id:new ObjectId(id)};
+        const result=await importsCollection.findOne(query);
+        res.send(result);
+    })
     app.post('/imports',async(req,res)=>{
         const newImport=req.body;
         const {productId,importedQuantity}=newImport;
@@ -83,6 +89,22 @@ async function run() {
         }
         const updateProductsResult=await productsCollection.updateOne(query,update);
         
+        res.send(result);
+    })
+    app.post('/imports/:id',async(req,res)=>{
+        const id=req.params.id;
+        const query={_id:new ObjectId(id)};
+        const eachImport=req.body;
+        // console.log(eachImport);
+        const {productId,importedQuantity}=eachImport;
+        const queryForUpdateQuantity={_id:new ObjectId(productId)};
+        const update={
+            $inc:{
+                availableQuantity:+importedQuantity
+            }
+        }
+        const updateProductsResult=await productsCollection.updateOne(queryForUpdateQuantity,update);
+        const result=await importsCollection.deleteOne(query);
         res.send(result);
     })
     // Send a ping to confirm a successful connection
