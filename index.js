@@ -60,6 +60,21 @@ async function run() {
     app.post('/imports',async(req,res)=>{
         const newImport=req.body;
         const {productId,importedQuantity}=newImport;
+        const existingImportedProduct=await importsCollection.findOne({productId:productId});
+        let result;
+        if(existingImportedProduct)
+        {
+            const queryProdId={productId:productId};
+            const update={
+                $inc:{
+                    importedQuantity:+importedQuantity
+                }
+            }
+    result=await importsCollection.updateOne(queryProdId,update)
+        }
+        else{
+            result=await importsCollection.insertOne(newImport);
+        }
         const query={_id:new ObjectId(productId)};
         const update={
             $inc:{
@@ -67,8 +82,8 @@ async function run() {
             }
         }
         const updateProductsResult=await productsCollection.updateOne(query,update);
-        const result=await importsCollection.insertOne(newImport);
-        res.send(result,updateProductsResult);
+        
+        res.send(result);
     })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
