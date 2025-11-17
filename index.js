@@ -103,8 +103,12 @@ availableQuantity:updatedProduct.availableQuantity,
     })
     app.post('/imports',async(req,res)=>{
         const newImport=req.body;
-        const {productId,importedQuantity}=newImport;
-        const existingImportedProduct=await importsCollection.findOne({productId:productId});
+        const {productId,importerEmail,importedQuantity}=newImport;
+        const queryExist={
+            productId:productId,
+            importerEmail:importerEmail
+        }
+        const existingImportedProduct=await importsCollection.findOne(queryExist);
         let result;
         if(existingImportedProduct)
         {
